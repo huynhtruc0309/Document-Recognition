@@ -1,0 +1,108 @@
+data:
+  train:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: train.core.data.dataset
+        class: MatchingDataset
+        MatchingDataset:
+          dirname: "'/data/ocr/namnt45/DKX/train'"
+          classes:
+            "BACK_2014": 0
+            "BACK_2020": 1
+            "FRONT_2014": 2
+            "FRONT_2020": 3
+          image_size: (512, 512)
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          device: '''cuda:0'''
+          return_triplets: False
+          get_triplets_func: None
+          num_channel: 1
+          transforms:
+            prev_transforms: []
+            main_transforms: []
+            post_transforms:
+              - iaa.PadToSquare(position='center')
+              - iaa.Resize(config['data']['train']['DataLoader']['dataset']['MatchingDataset']['image_size'])
+      batch_size: 4*16*2
+      shuffle: False
+  valid:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: train.core.data.dataset
+        class: MatchingDataset
+        MatchingDataset:
+          dirname: "'/data/ocr/namnt45/DKX/valid'"
+          classes:
+            "BACK_2014": 0
+            "BACK_2020": 1
+            "FRONT_2014": 2
+            "FRONT_2020": 3
+          image_size: (512, 512)
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          device: '''cuda:0'''
+          return_triplets: False
+          get_triplets_func: None
+          num_channel: 1
+          transforms:
+            prev_transforms: []
+            main_transforms: []
+            post_transforms:
+              - iaa.PadToSquare(position='center')
+              - iaa.Resize(config['data']['valid']['DataLoader']['dataset']['MatchingDataset']['image_size'])
+      batch_size: 4*16*2
+      shuffle: False
+  test:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: train.core.data.dataset
+        class: MatchingDataset
+        MatchingDataset:
+          dirname: "'/data/ocr/namnt45/DKX/valid'"
+          classes:
+            "BACK_2014": 0
+            "BACK_2020": 1
+            "FRONT_2014": 2
+            "FRONT_2020": 3
+          image_size: (512, 512)
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          device: '''cuda:0'''
+          return_triplets: False
+          get_triplets_func: None
+          num_channel: 1
+          transforms:
+            prev_transforms: []
+            main_transforms: []
+            post_transforms:
+              - iaa.PadToSquare(position='center')
+              - iaa.Resize(config['data']['test']['DataLoader']['dataset']['MatchingDataset']['image_size'])
+      batch_size: 4*16*2
+      shuffle: False
+
+model:
+  module: train.core.model.models
+  class: EmbeddingResNet
+  EmbeddingResNet:
+    model_name: '''resnet18'''
+    num_channel: 1
+    embedding_size: 128
+    pretrained: True
+
+inference:
+  device: '''cuda:0'''
+  checkpoint_dir: '''inference/global/checkpoints/dkx'''
+  template_path: '''template.dill'''
+  threshold_path: '''threshold.json'''
+  resume_checkpoint_path: '''train/checkpoints/dkx/20211808_114839/best.pt'''
+
+extralibs:
+  torch: torch
+  iaa: imgaug.augmenters

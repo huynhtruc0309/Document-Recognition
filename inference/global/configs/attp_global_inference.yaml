@@ -1,0 +1,114 @@
+data:
+  train:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: train.core.data.dataset
+        class: MatchingDataset
+        MatchingDataset:
+          dirname: '''/extdata/ocr/namth37/Data_ATTP/1. Phiếu kiểm nghiệm/ATTP/train'''
+          classes:
+            "FTC": 0
+            "HITECH": 1
+            "OTHERS": 2
+            "QUACERT": 3
+            "VIETTIN": 4
+            "WARRANTEK": 5
+          image_size: (512, 512)
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          device: '''cuda:0'''
+          return_triplets: False
+          get_triplets_func: None
+          num_channel: 1
+          transforms:
+            prev_transforms: []
+            main_transforms: []
+            post_transforms:
+              - iaa.PadToSquare(position='center')
+              - iaa.Resize(config['data']['train']['DataLoader']['dataset']['MatchingDataset']['image_size'])
+      batch_size: 6*8*2
+      shuffle: False
+  valid:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: train.core.data.dataset
+        class: MatchingDataset
+        MatchingDataset:
+          dirname: '''/extdata/ocr/namth37/Data_ATTP/1. Phiếu kiểm nghiệm/ATTP/valid'''
+          classes:
+            "FTC": 0
+            "HITECH": 1
+            "OTHERS": 2
+            "QUACERT": 3
+            "VIETTIN": 4
+            "WARRANTEK": 5
+          image_size: (512, 512)
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          device: '''cuda:0'''
+          return_triplets: False
+          get_triplets_func: None
+          num_channel: 1
+          transforms:
+            prev_transforms: []
+            main_transforms: []
+            post_transforms:
+              - iaa.PadToSquare(position='center')
+              - iaa.Resize(config['data']['valid']['DataLoader']['dataset']['MatchingDataset']['image_size'])
+      batch_size: 6*8*2
+      shuffle: False
+  test:
+    module: torch.utils.data
+    class: DataLoader
+    DataLoader:
+      dataset:
+        module: train.core.data.dataset
+        class: MatchingDataset
+        MatchingDataset:
+          dirname: '''/extdata/ocr/namth37/Data_ATTP/1. Phiếu kiểm nghiệm/ATTP/test'''
+          classes:
+            "FTC": 0
+            "HITECH": 1
+            "OTHERS": 2
+            "QUACERT": 3
+            "VIETTIN": 4
+            "WARRANTEK": 5
+          image_size: (512, 512)
+          image_patterns:
+            ["'*.jpg'", "'*.png'", "'*.jpeg'", "'*.JPG'", "'*.PNG'", "'*.JPEG'"]
+          device: '''cuda:0'''
+          return_triplets: False
+          get_triplets_func: None
+          num_channel: 1
+          transforms:
+            prev_transforms: []
+            main_transforms: []
+            post_transforms:
+              - iaa.PadToSquare(position='center')
+              - iaa.Resize(config['data']['test']['DataLoader']['dataset']['MatchingDataset']['image_size'])
+      batch_size: 6*8*2
+      shuffle: False
+
+model:
+  module: train.core.model.models
+  class: EmbeddingResNet
+  EmbeddingResNet:
+    model_name: '''resnet18'''
+    num_channel: 1
+    embedding_size: 128
+    pretrained: True
+
+inference:
+  device: '''cuda:0'''
+  checkpoint_dir: '''inference/global/checkpoints/attp'''
+  template_path: '''template.dill'''
+  threshold_path: '''threshold.json'''
+  resume_checkpoint_path: '''train/checkpoints/attp/20211708_155901/e30_loss0.50000_acc99.64912.pt'''
+
+extralibs:
+  torch: torch
+  iaa: imgaug.augmenters
